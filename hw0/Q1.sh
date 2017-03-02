@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python Q1.py
+python 'Q1.py' $1 $2

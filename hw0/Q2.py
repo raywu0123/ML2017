@@ -1,7 +1,7 @@
 from PIL import Image
-
-im1=Image.open("lena.png")
-im2=Image.open("lena_modified.png")
+import sys
+im1=Image.open(sys.argv[1])
+im2=Image.open(sys.argv[2])
 
 L=512
 im_out=Image.new("RGB",(L,L),"white")

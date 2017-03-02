@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 def read_file(file_name):
     file=open(file_name,"r")
@@ -9,15 +10,16 @@ def read_file(file_name):
     file.close()
     return B
 
-A=read_file("matrixA.txt")
-B=read_file("matrixB.txt")
+print sys.argv
+
+A=read_file(sys.argv[1])
+B=read_file(sys.argv[2])
 C=np.dot(A,B)
-print C
-output=open("ans_one.txt","w")
+C=[sorted(C[0])]
+#print C
+output=open('ans_one.txt',"w")
 
 for num in C[0]:
     output.write(str(num)+"\n")
 output.close()
-
-
 
