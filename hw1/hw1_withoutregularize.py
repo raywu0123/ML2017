@@ -54,22 +54,24 @@ print(train_data_points)
 for start_point in range(24*240-10):
     y_hat[start_point]=train_data[9][9+start_point]
 
-r_learn=5.5e-10
+r_learn=5e-3
 ##training step
 theta=np.array([[0.0]])##9 hours*18 featurs + 1bias
 theta.resize((9*17+1,1))
-theta_new=np.copy(theta)
+grad_square_sum=np.copy(theta)
 training_it=0
 error_sum_previous=0.0
 training_time=float(input('training_time='))
 while(time.time()-start_time<=training_time):
     h_theta=np.dot(train_data_points,theta)
     error=y_hat-h_theta
-    theta+=np.dot(train_data_points.T,error) * r_learn
+    grad=np.dot(train_data_points.T,error)
+    grad_square_sum+=grad**2
+    theta+= grad* r_learn/(grad_square_sum**0.5)
     error_sum=np.sum(error**2)**0.5
-    if training_it%10000==0: print("time= ",time.time()-start_time," , ",error_sum)
+    if training_it%1000==0: print("time= ",time.time()-start_time," , ",error_sum)
     training_it+=1
-
+    '''
     r_learn*=1.001
 
     if error_sum_previous<error_sum:
@@ -77,7 +79,7 @@ while(time.time()-start_time<=training_time):
         #print('lower')
 
     error_sum_previous=error_sum
-
+    '''
 
 
 

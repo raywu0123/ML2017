@@ -89,12 +89,12 @@ y_hat.resize((24*240-10,1))##label of training_data
 for start_point in range(24*240-10):
     y_hat[start_point]=train_data[9][9+start_point]
 
-r_learn=5e-12
+r_learn=1e-3
 ##training step
 theta=np.array([[0.0]])##featur_num + bias
 theta.resize((54+1,1))
+grad_square_sum=np.copy(theta)
 theta=load_theta('theta_1st.txt')
-print(theta)
 h_theta=np.dot(train_data_points,theta)
 error=y_hat-h_theta
 error_sum=np.sum(error**2)**0.5
@@ -110,28 +110,30 @@ training_time=float(input('training_time='))
 while(time.time()-start_time<=training_time):
     h_theta=np.dot(train_data_points,theta)
     error=y_hat-h_theta
-    theta+=np.dot(train_data_points.T,error) * r_learn
+    grad=np.dot(train_data_points.T,error)
+    grad_square_sum+=grad**2
+    theta+= grad* r_learn/(grad_square_sum**0.5)
     error_sum=np.sum(error**2)**0.5
     if training_it%1000==0: print("time= ",int(time.time()-start_time)," , ",error_sum,r_learn)
     training_it+=1
-
+    '''
     r_learn*=1.01
     if error_sum_previous<error_sum:
         r_learn/=1.1
         #print('lower')
 
     error_sum_previous=error_sum
-
+    '''
 
 
 
 print(theta)
-'''
-output=open('theta.txt',"w")
+
+output=open('theta_2nd_adagrad.txt',"w")
 for term in theta:
     output.write(str(term[0])+'\n')
 output.close()
-'''
+
 
 
 ###reading from test file, store in test_data

@@ -1,4 +1,3 @@
-__author__ = 'ray'
 # coding = Big5
 __author__ = 'ray'
 ##plan: using only pm25 data as feature
@@ -6,8 +5,6 @@ __author__ = 'ray'
 ##save theta to a file
 ##read theta from file and train with second order terms
 
-
-##using Adagrad algorithm to deal with learning rate
 import numpy as np
 import csv
 import time
@@ -84,62 +81,58 @@ start_time=time.time()
 A=read_file('train.csv')
 train_data=extract_data(A,24,3,1)
 #print(train_data[9])
-train_data_points=data_to_point(train_data,trails=24*240-10,diff_m=1,dim=1,feat_num=9)
-
 ##extract labels from data
 y_hat=np.array([[0.0]])
 y_hat.resize((24*240-10,1))##label of training_data
 for start_point in range(24*240-10):
     y_hat[start_point]=train_data[9][9+start_point]
 
-r_learn=1.0
-##training step
-theta=np.array([[0.0]])##featur_num + bias
-theta.resize((9+1,1))
-grad_square_sum=np.copy(theta)
-#theta=load_theta('theta.txt')
-
-h_theta=np.dot(train_data_points,theta)
-error=y_hat-h_theta
-error_sum=np.sum(error**2)**0.5
-print(error_sum)
 
 
-
-
-training_it=0
-error_sum_previous=0.0
-training_time=float(input('training_time='))
-#training_time=30
-while(time.time()-start_time<=training_time):
+def training(theta_file_name,dimension,feat_n,r_learn):
+    train_data_points=data_to_point(train_data,trails=24*240-10,diff_m=1,dim=dimension,feat_num=feat_n)
+    ##training step
+    theta=np.array([[0.0]])##featur_num + bias
+    theta.resize((feat_n+1,1))
+    grad_square_sum=np.copy(theta)
+    theta=load_theta('theta_1st.txt')
     h_theta=np.dot(train_data_points,theta)
     error=y_hat-h_theta
-    grad=np.dot(train_data_points.T,error)
-    grad_square_sum+=grad**2
-    theta+= grad* r_learn/(grad_square_sum**0.5)
     error_sum=np.sum(error**2)**0.5
-    if training_it%1000==0: print("time= ",int(time.time()-start_time)," , ",error_sum,r_learn)
-    training_it+=1
-    '''
-    r_learn*=1.01
-    if error_sum_previous<error_sum:
-        r_learn/=1.1
-        #print('lower')
+    print(error_sum)
+    training_it=0
+    error_sum_previous=0.0
+    training_time=float(input('training_time='))
+    #training_time=30
+    while(time.time()-start_time<=training_time):
+        h_theta=np.dot(train_data_points,theta)
+        error=y_hat-h_theta
+        grad=np.dot(train_data_points.T,error)
+        grad_square_sum+=grad**2
+        theta+= grad* r_learn/(grad_square_sum**0.5)
+        error_sum=np.sum(error**2)**0.5
+        if training_it%10000==0: print("time= ",int(time.time()-start_time)," , ",error_sum,r_learn)
+        training_it+=1
+        '''
+        r_learn*=1.01
+        if error_sum_previous<error_sum:
+            r_learn/=1.1
+            #print('lower')
 
-    error_sum_previous=error_sum
-    '''
-print(theta)
-'''
-output=open('theta_1st.txt',"w")
-for term in theta:
-    output.write(str(term[0])+'\n')
-output.close()
-'''
+        error_sum_previous=error_sum
+        '''
+    print(theta)
+    output=open("theta_"+str(d)+"nd_adagrad.txt","w")
+    for term in theta:
+        output.write(str(term[0])+'\n')
+    output.close()
+
+training('theta_1st.txt',2,54,5e-3)
 
 ###reading from test file, store in test_data
 B=read_file('test_X.csv')
 test_data=extract_data(B,9,2,0)
-test_data_points=data_to_point(test_data,240,9,1,9)
+test_data_points=data_to_point(test_data,240,9,2,54)
 h_theta=np.dot(test_data_points,theta)
 
 with open('submission.csv', 'w') as csvfile:
@@ -150,4 +143,3 @@ with open('submission.csv', 'w') as csvfile:
         pm25_prediction=int(round(h_theta[start_point][0]))
         print('id_'+str(start_point)+","+str(pm25_prediction))
         writer.writerow({'id': 'id_'+str(start_point), 'value': str(pm25_prediction)})
-
