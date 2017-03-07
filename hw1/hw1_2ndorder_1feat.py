@@ -94,7 +94,7 @@ r_learn=1e-3
 theta=np.array([[0.0]])##featur_num + bias
 theta.resize((54+1,1))
 grad_square_sum=np.copy(theta)
-theta=load_theta('theta_1st.txt')
+theta=load_theta('theta_st.txt')
 h_theta=np.dot(train_data_points,theta)
 error=y_hat-h_theta
 error_sum=np.sum(error**2)**0.5
@@ -129,7 +129,7 @@ while(time.time()-start_time<=training_time):
 
 print(theta)
 
-output=open('theta_2nd_adagrad.txt',"w")
+output=open('theta_2_adagrad.txt',"w")
 for term in theta:
     output.write(str(term[0])+'\n')
 output.close()

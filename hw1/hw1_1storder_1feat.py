@@ -130,7 +130,7 @@ while(time.time()-start_time<=training_time):
     '''
 print(theta)
 '''
-output=open('theta_1st.txt',"w")
+output=open('theta_st.txt',"w")
 for term in theta:
     output.write(str(term[0])+'\n')
 output.close()
