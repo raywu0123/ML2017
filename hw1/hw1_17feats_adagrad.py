@@ -34,6 +34,26 @@ def extract_data(A,hour,bias_x,bias_y):
     return data
 train_data=extract_data(A,24,3,1)
 
+def file_len(fname):
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i
+
+def load_theta_17feats(filename,feat_n):
+    file_l=file_len(filename)
+    file=open(filename,'r')
+    l=np.array([0.0])
+    l.resize((feat_n+1,1))
+    index=0
+    for line in file:
+        #print(line,float(line))
+        if index!=file_l:
+            l[81+index][0]=float(line)
+        else:
+            l[-1][0]=float(line)
+        index+=1
+    return l
 
 ##forming data point array
 def data_to_point(data,trails,diff_m):
@@ -54,11 +74,12 @@ print(train_data_points)
 for start_point in range(24*240-10):
     y_hat[start_point]=train_data[9][9+start_point]
 
-r_learn=5e-3
+r_learn=8e-2
 ##training step
 theta=np.array([[0.0]])##9 hours*18 featurs + 1bias
 theta.resize((9*17+1,1))
 grad_square_sum=np.copy(theta)
+theta=load_theta_17feats('theta_1_adagrad.txt',17*9)
 training_it=0
 error_sum_previous=0.0
 training_time=float(input('training_time='))
