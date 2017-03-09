@@ -58,11 +58,18 @@ def unison_shuffle(a,b):
     p=np.random.permutation(len(a))
     return a[p], b[p]
 ##forming data point array
-def data_to_point(data,trails,diff_m,dim,feat_num):
+def data_to_point(data,trails,diff_m,dim,feat_num,stat='Train'):
+    print(data[8],data[9])
+    if stat=='Train':
+        for i in range(len(data)):
+            feature=data[i]
+            data[i]=np.copy(normalize(feature))
+    print(data[8],data[9])
+    input()
     data_points=np.array([[0.0]])
     data_points.resize((trails,feat_num+1)) ##shape of
     for start_point in range(trails):
-        data_part=data[9:10,0+start_point*diff_m:9+start_point*diff_m].flatten() ##only pm25 feature
+        data_part=data[8:10,0+start_point*diff_m:9+start_point*diff_m].flatten() ##only pm25 feature
         data_part_expand=expand(data_part,dimension=dim)
         data_part_expand.resize((feat_num+1))
         data_part_expand[-1]=1.0
@@ -93,14 +100,9 @@ def training(dimension,feat_n,r_learn,theta_file_name=''):
     grad_square_sum=np.copy(theta)
     if dimension>1:
         theta=load_theta(theta_file_name,feat_n=feat_n)
-    else:
-        theta=np.random.rand(feat_n+1,1)
     print(theta)
     h_theta=np.dot(train_data_points,theta)
-    y_hat=np.array([[0.0]])
-    y_hat.resize((24*240-10,1))##label of training_data
-    for start_point in range(24*240-10):
-        y_hat[start_point]=train_data[9][9+start_point]
+
     error=y_hat-h_theta
     error_sum=np.sum(error**2)**0.5
     print(error_sum)
@@ -118,8 +120,6 @@ def training(dimension,feat_n,r_learn,theta_file_name=''):
         error_sum=np.sqrt(np.sum(np.square(error)))
         if training_it%1000==0: print("time= ",int(time.time()-start_time)," , ",error_sum)
         training_it+=1
-
-
         '''
         r_learn*=1.01
         if error_sum_previous<error_sum:
@@ -138,6 +138,11 @@ def training(dimension,feat_n,r_learn,theta_file_name=''):
 ##extract data from file and convert to data points
 A=read_file('train.csv')
 train_data=extract_data(A,24,3,1)
+mean_9=np.mean(train_data[9])
+std_9=np.std(train_data[9])
+mean_8=np.mean(train_data[8])
+std_8=np.std(train_data[8])
+print(mean_9,std_9,mean_8,std_8)
 #print(train_data[9])
 ##extract labels from data
 y_hat=np.array([[0.0]])
@@ -145,19 +150,23 @@ y_hat.resize((24*240-10,1))##label of training_data
 for start_point in range(24*240-10):
     y_hat[start_point]=train_data[9][9+start_point]
 
-#training(dimension=1,feat_n=9,r_learn=1.0)
-training(dimension=2,feat_n=54,r_learn=1e-3,theta_file_name='theta_1_adagrad.txt')
-#training(dimension=3,feat_n=219,r_learn=1e-8,theta_file_name='theta_2_adagrad.txt')
+training(dimension=1,feat_n=18,r_learn=1.0)
+training(dimension=2,feat_n=189,r_learn=1e-3,theta_file_name='theta_1_adagrad.txt')
+training(dimension=3,feat_n=1329,r_learn=1e-5,theta_file_name='theta_2_adagrad.txt')
 
-theta=load_theta('theta_1_adagrad.txt',feat_n=9)
+theta=load_theta('theta_3_adagrad.txt',feat_n=1329)
 
 ###reading from test file, store in test_data
 B=read_file('test_X.csv')
 test_data=extract_data(B,9,2,0)
-test_data_points=data_to_point(test_data,trails=240,diff_m=9,dim=1,feat_num=9)
+test_data[9]=(test_data[9]-mean_9)/std_9
+test_data[8]=(test_data[8]-mean_8)/std_8
+test_data_points=data_to_point(test_data,trails=240,diff_m=9,dim=3,feat_num=1329,stat='Test')
 
-'''
+
 h_theta=np.dot(test_data_points,theta)
+
+print(h_theta)
 
 with open('submission.csv', 'w') as csvfile:
     fieldnames = ['id', 'value']
@@ -167,4 +176,3 @@ with open('submission.csv', 'w') as csvfile:
         pm25_prediction=int(round(h_theta[start_point][0]))
         print('id_'+str(start_point)+","+str(pm25_prediction))
         writer.writerow({'id': 'id_'+str(start_point), 'value': str(pm25_prediction)})
-'''
