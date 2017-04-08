@@ -1,48 +1,61 @@
 import numpy as np
+import csv
+import time
+import  sys
+import random
+import matplotlib.pyplot as plt
 from keras.models import Sequential
+from keras.utils import np_utils
 from keras.layers.core import Dense, Dropout, Activation
 from keras.layers import Convolution2D, MaxPooling2D, Flatten
 from keras.optimizers import SGD, Adam
-from keras.utils import np_utils
-from keras.datasets import mnist
 
 
-# categorical_crossentropy
+def read_file(file_name,stat):
+    if stat=='train':
+        number=28000
+    elif stat=='test':
+        number=7178
+    X=np.array([[[0.0]*48]*48]*number,dtype='float32')
+    Y=np.array([[0.0]]*number,dtype='float32')
+    with open(file_name, newline='', encoding='Big5') as f:
+        reader = csv.reader(f)
+        count=0
+        for row in reader:
+            if count!=0:
+                X[count-1]=np.array(row[1].split(),dtype='float32').reshape(48,48)
+                Y[count-1]=np.array(row[0],dtype='float32')
+            if count==number:
+                break
+            count+=1
+    return X,Y
 
-def load_data():
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    number = 10000
-    x_train = x_train[0:number]
-    y_train = y_train[0:number]
-    x_train = x_train.reshape(number, 28 * 28)
-    x_test = x_test.reshape(x_test.shape[0], 28 * 28)
-    x_train = x_train.astype('float32')
-    x_test = x_test.astype('float32')
-    # convert class vectors to binary class matrices
-    y_train = np_utils.to_categorical(y_train, 10)
-    y_test = np_utils.to_categorical(y_test, 10)
-    x_train = x_train / 255
-    x_test = x_test / 255
-    print(x_train[0])
-    print(y_train[0])
-    return (x_train, y_train), (x_test, y_test)
-
-
-(x_train, y_train), (x_test, y_test) = load_data()
+x_train,y_train=read_file('train.csv',stat='train')
+x_train/=255
+y_train = np_utils.to_categorical(y_train, 7)
+x_train=np.expand_dims(x_train,axis=4)
+print(x_train.shape)
+input('read in files......pause')
 
 model = Sequential()
-model.add(Dense(input_dim=28 * 28, output_dim=689))
+model.add(Convolution2D(filters=25,kernel_size=5,input_shape=(48,48,1),data_format='channels_last'))
+model.add(MaxPooling2D((2,2)))
+model.add(Convolution2D(filters=50,kernel_size=5))
+model.add(MaxPooling2D((2,2)))
+model.add(Flatten())
+
+model.add(Dense(output_dim=500))
 model.add(Activation('relu'))
-model.add(Dense(output_dim=689))
+model.add(Dense(output_dim=500))
 model.add(Activation('relu'))
-model.add(Dense(output_dim=689))
+model.add(Dense(output_dim=500))
 model.add(Activation('relu'))
-model.add(Dense(output_dim=10))
+model.add(Dense(output_dim=7))
 model.add(Activation('softmax'))
 
 model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['accuracy'])
 
-model.fit(x_train, y_train, batch_size=100, epochs=10)
+model.fit(x_train, y_train, batch_size=100, epochs=40)
+model.save('04081514.h5')
 
-score = model.evaluate(x_test, y_test)
-print('\nTest Acc:', score[1])
+
