@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-python3 hw3_load $1 $2
+python3 hw3_load.py $1 $2
