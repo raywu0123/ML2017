@@ -1,16 +1,10 @@
 __author__ = 'ray'
 import numpy as np
 import csv
-import time
 import  sys
-import random
 import matplotlib.pyplot as plt
 from keras.models import Sequential,load_model
-from keras.utils import np_utils
-from keras.layers.core import Dense, Dropout, Activation
-from keras.layers import Convolution2D, MaxPooling2D, Flatten
-from keras.optimizers import SGD, Adam
-
+from keras.utils import np_utils,plot_model
 
 def read_file(file_name,stat):
     if stat=='train':
@@ -47,12 +41,16 @@ x_test=np.expand_dims(x_test,axis=4)
 print(x_test.shape)
 input('read in files......pause')
 
-model=load_model('04081445.h5')
+
+model=load_model('./models/04302055_DNN.h5')
+
+
 y_train=model.predict(x_test)
 print(y_train)
 y_train_noncat=np.expand_dims(np.argmax(y_train,1),1)
 print(y_train_noncat)
 write_file('Submission.csv',y_train_noncat)
 
-
+print(model.summary())
+plot_model(model, to_file='model_DNN.png',show_shapes=True)
 
