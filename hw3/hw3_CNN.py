@@ -30,12 +30,12 @@ def read_file(file_name,stat):
             count+=1
     return X,Y
 
-x_train,y_train=read_file('train.csv',stat='train')
+train_filename=sys.argv[1]
+x_train,y_train=read_file(train_filename,stat='train')
 x_train/=255
 y_train = np_utils.to_categorical(y_train, 7)
 x_train=np.expand_dims(x_train,axis=4)
 print(x_train.shape)
-input('read in files......pause')
 
 datagen = ImageDataGenerator(
     featurewise_center=False,
@@ -88,5 +88,7 @@ while(Con):
     a=input('Continue?(Y/n)')
     if a=='n':
         Con=False
-model.save('04231445.h5')
 
+
+model.save('model.h5')
+print('model saved as h5 file')

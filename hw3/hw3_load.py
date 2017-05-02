@@ -2,9 +2,7 @@ __author__ = 'ray'
 import numpy as np
 import csv
 import  sys
-import matplotlib.pyplot as plt
-from keras.models import Sequential,load_model
-from keras.utils import np_utils,plot_model
+from keras.models import load_model
 
 def read_file(file_name,stat):
     if stat=='train':
@@ -35,22 +33,26 @@ def write_file(filename,h_theta):
             print(str(start_point)+","+str(pm25_prediction))
             writer.writerow({'id': str(start_point), 'label': str(pm25_prediction)})
 
-x_test=read_file('test.csv',stat='test')[0]
+
+print(sys.argv)
+test_filename=sys.argv[1]
+prediction_filenamce=sys.argv[2]
+
+x_test=read_file(test_filename,stat='test')[0]
 x_test/=255
 x_test=np.expand_dims(x_test,axis=4)
 print(x_test.shape)
-input('read in files......pause')
 
 
-model=load_model('./models/04302055_DNN.h5')
-
+model=load_model('CNN_model.h5')
+print('model loaded')
 
 y_train=model.predict(x_test)
 print(y_train)
 y_train_noncat=np.expand_dims(np.argmax(y_train,1),1)
 print(y_train_noncat)
-write_file('Submission.csv',y_train_noncat)
+write_file(prediction_filenamce,y_train_noncat)
 
 print(model.summary())
-plot_model(model, to_file='model_DNN.png',show_shapes=True)
+#plot_model(model, to_file='model_DNN.png',show_shapes=True)
 
