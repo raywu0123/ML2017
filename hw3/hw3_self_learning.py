@@ -1,15 +1,11 @@
 __author__ = 'ray'
 import numpy as np
 import csv
-import time
-import  sys
-import random
-from keras.models import Sequential,load_model
-from keras.utils import np_utils,plot_model
+from keras.models import Sequential
+from keras.utils import np_utils
 from keras.layers.core import Dense, Dropout, Activation
-from keras.layers import Convolution2D, MaxPooling2D, Flatten,normalization,advanced_activations,ZeroPadding2D
-from keras.optimizers import SGD, Adam,rmsprop,adagrad,adadelta
-from keras.regularizers import*
+from keras.layers import Convolution2D, MaxPooling2D, Flatten,advanced_activations
+from keras.optimizers import  Adam
 from keras.preprocessing.image import ImageDataGenerator
 
 def read_file(file_name,stat):
