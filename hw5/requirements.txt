@@ -1,0 +1,5 @@
+numpy
+keras
+csv
+pickle
+h5py

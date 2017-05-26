@@ -4,6 +4,7 @@ import keras.backend as K
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import load_model
 import pickle
+import h5py
 
 
 test_path = sys.argv[1]
