@@ -20,13 +20,16 @@ column_labels.remove("construction_year")
 #test = test.fillna(test.median())
 
 for i in column_labels:
-	unique_value = list(set(np.concatenate((train_value[i].unique() , test[i].unique()))))
+	unique_value = list(np.concatenate((train_value[i].unique() , test[i].unique())))
 	print(i)
-	print(train_value[i].unique())
-	print(test[i].unique())
+	#print(train_value[i].unique())
+	#print(test[i].unique())
+	#print(np.concatenate((train_value[i].unique() , test[i].unique())))
+	#print(set(np.concatenate((train_value[i].unique() , test[i].unique()))))
 	print(unique_value)
 	size = len(unique_value)
 	print(size)
+	#input()
 	for j in range(size):
 		if unique_value[j] != "nan":
 			#print(j)

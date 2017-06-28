@@ -61,7 +61,7 @@ print('test_data_loaded.')
 num_data=len(test_data.files)
 for i in range(num_data):
     test_x=PCA().fit(test_data[str(i)]).explained_variance_ratio_.cumsum()
-    input(test_data[str(i)].shape)
+    #input(test_data[str(i)].shape)
     test_x=np.array([test_x])
     test_y=model.predict(test_x)
     print(i,test_y[0][0],np.log(test_y[0][0]))

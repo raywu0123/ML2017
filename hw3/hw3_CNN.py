@@ -30,8 +30,9 @@ def read_file(file_name,stat):
             count+=1
     return X,Y
 
-train_filename=sys.argv[1]
+train_filename='train.csv'
 x_train,y_train=read_file(train_filename,stat='train')
+print(y_train)
 x_train/=255
 y_train = np_utils.to_categorical(y_train, 7)
 x_train=np.expand_dims(x_train,axis=4)

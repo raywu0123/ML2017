@@ -51,14 +51,15 @@ def get_user_feat(user_id,users):
 data_dir=sys.argv[1]
 prediction_dir=sys.argv[2]
 
-train_data=pd.read_csv(data_dir+'train.csv',index_col=[0])
-users=np.asarray(pd.read_csv(data_dir+'users.csv',sep="::"))
-movies=pd.read_csv(data_dir+'movies.csv',sep="::")
 
-user_id=np.asarray([train_data['UserID']]).T
-user_feats=get_user_feat(user_id,users)
-movie_id=np.asarray([train_data['MovieID']]).T
-rate=np.asarray([train_data['Rating']]).T
+#train_data=pd.read_csv(data_dir+'train.csv',index_col=[0])
+#users=np.asarray(pd.read_csv(data_dir+'users.csv',sep="::"))
+#movies=pd.read_csv(data_dir+'movies.csv',sep="::")
+
+#user_id=np.asarray([train_data['UserID']]).T
+#user_feats=get_user_feat(user_id,users)
+#movie_id=np.asarray([train_data['MovieID']]).T
+#rate=np.asarray([train_data['Rating']]).T
 
 '''
 ################ Rating Normalization
@@ -66,14 +67,14 @@ MEAN=np.mean(rate)
 STD=np.std(rate)
 rate=(rate-MEAN)/STD
 ####################################
-'''
+
 
 full=np.concatenate((movie_id,user_feats),axis=1)
 full=np.concatenate((full,rate),axis=1)
 print(full)
 np.random.shuffle(full)
 print(full.shape)
-'''
+
 model=build_model()
 model.compile(optimizer='adam',loss='mean_squared_error')
 
@@ -93,9 +94,11 @@ test_data=pd.read_csv(data_dir+'test.csv',index_col=[0])
 sample=pd.read_csv('SampleSubmission.csv',index_col=[0])
 test_user_id=np.asarray([test_data['UserID']]).T
 test_movie_id=np.asarray([test_data['MovieID']]).T
-test_user_feats=get_user_feat(test_user_id,users)
+#test_user_feats=get_user_feat(test_user_id,users)
 
-prediction=best_model.predict([test_movie_id,test_user_feats[:,0]])
+print(test_user_id)
+
+prediction=best_model.predict([test_movie_id,test_user_id])
 #prediction=prediction*STD+MEAN
 prediction[prediction<0]=0
 prediction[prediction>5]=5
