@@ -1,16 +1,18 @@
 author='ray'
 
-discrete_features=['funder','installer','wpt-name','basin','subvilliage',
+discrete_features=['funder','installer','wpt_name','basin','subvillage',
 'region','lga','ward','recorded_by','scheme_management','scheme_name',
-'extraction_type','extracton_type_group','extraction_type_class','management',
+'extraction_type','extraction_type_group','extraction_type_class','management',
 'management_group','payment','payment_type','water_quality','quality_group',
-'quantity','quantity_group','source,source_type','source_class','waterpoint_type',
-'waterpoint_type_group']
+'quantity','quantity_group','source','source_type','source_class','waterpoint_type',
+'waterpoint_type_group','region_code','district_code']
 
 import gc
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier,AdaBoostClassifier,BaggingClassifier
+from sklearn.ensemble import RandomForestClassifier,AdaBoostClassifier,BaggingClassifier,ExtraTreesClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier,GradientBoostingClassifier
+from sklearn.linear_model import SGDClassifier,LogisticRegression,RidgeClassifier
 from sklearn.metrics import accuracy_score
 import time
 from keras.models import Sequential,Model
@@ -42,6 +44,12 @@ def get_data(train_data_path,test_data_path):
 	column_labels.remove("source_type")## source instead
 	column_labels.remove("source_class")## source instead
 	column_labels.remove("waterpoint_type_group")## watertype instead
+	column_labels.remove("funder")
+	column_labels.remove("installer")
+	column_labels.remove("wpt_name")
+	column_labels.remove("subvillage")
+	column_labels.remove("ward")
+	column_labels.remove("scheme_name")
 
 	selected_discrete_features=[]
 	selected_continuous_features=[]
@@ -89,7 +97,7 @@ def training(train,selected_continous_feats,selected_discrete_feats):
 		return clf
 	def adaboost_model(train_x,train_y):
 		# Classifier
-		clf = AdaBoostClassifier(n_estimators=300)
+		clf = AdaBoostClassifier(n_estimators=10)
 		print("Classifier: successfully")
 		# Traning
 		clf.fit(train_x,train_y)
@@ -109,8 +117,19 @@ def training(train,selected_continous_feats,selected_discrete_feats):
 		accuracy = accuracy_score(clf.predict(validation[column_labels]), validation["status_group"])
 		print("Accuracy = " + str(accuracy))
 		return clf
+	def SVC_model(train_x,train_y):
+		# Classifier
+		clf =GradientBoostingClassifier(n_estimators=10,max_depth=10,)
+		print("Classifier: successfully")
+		# Traning
+		clf.fit(train_x,train_y)
+		print("Traning: successfully")
+		# Accuracy
+		accuracy = accuracy_score(clf.predict(validation[column_labels]), validation["status_group"])
+		print("Accuracy = " + str(accuracy))
+		return clf
 	def keras_model(train_x_c,train_x_d,train_y_class):
-		embedding_dim=50
+		embedding_dim=5
 		c_inputs=[]
 		d_inputs=[]
 		emb_vecs=[]
@@ -140,8 +159,9 @@ def training(train,selected_continous_feats,selected_discrete_feats):
 		return model
 	#clf=random_forest_model(train_x,train_y)
 	#clf=bagging_model(train_x,train_y)
-	clf=keras_model(train_x_c,train_x_d,train_y_class)
+	#clf=keras_model(train_x_c,train_x_d,train_y_class)
 	#clf=adaboost_model(train_x,train_y)
+	clf=SVC_model(train_x,train_y)
 	return clf
 
 def testing(test,selected_continous_feats,selected_discrete_feats,clf):
